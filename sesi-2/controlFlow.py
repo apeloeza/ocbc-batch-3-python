@@ -1,4 +1,3 @@
-
 x=0
 y=3
 if x<y: print('yes')   #true
@@ -74,7 +73,7 @@ else: print("I don't know who you are!")
 
 if 'a' in 'bar': print('foo')
 elif 1/10: print ("this won't happen")
-elif var: print("this won't either")
+elif vars: print("this won't either")
 
 #One-line Statements
 if 'a' in'foo': print('1');print('2'); print('3')
