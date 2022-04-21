@@ -112,8 +112,8 @@ paths:
             properties:
               fname:
                 type: string
-              lname:
-                type: string
+              # lname:
+              #   type: string
       responses:
         200:
           description: Successfully updated person in people list
