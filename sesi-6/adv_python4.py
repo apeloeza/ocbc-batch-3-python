@@ -1,3 +1,5 @@
+# Import Function
+
 import functools
 import time
 
@@ -10,8 +12,8 @@ def timer(func):
         end_time = time.perf_counter()      # 2
         run_time = end_time - start_time    # 3
         print(f"Finished {func.__name__!r} in {run_time:.4f} secs")
+        print(f"From {start_time} to {end_time}")
         return value
-        
     return wrapper_timer
 
 @timer
@@ -19,3 +21,5 @@ def waste_some_time(num_times):
     for _ in range(num_times):
         sum([i**2 for i in range(10000)])
 
+waste_some_time(1)
+waste_some_time(999)
