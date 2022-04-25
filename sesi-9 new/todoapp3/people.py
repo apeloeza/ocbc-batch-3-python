@@ -5,17 +5,18 @@ people data
 
 from flask import make_response, abort
 from config import db
-from models import Person, PersonSchema, Note
+from models import Person, PersonSchema
 
 
 def read_all():
     """
     This function responds to a request for /api/people
     with the complete lists of people
+
     :return:        json string of list of people
     """
     # Create the list of people from our data
-    people = Person.query.order_by(Person.lname).all()
+    people = Person.query.order_by(Person.person_id).all()
 
     # Serialize the data for the response
     person_schema = PersonSchema(many=True)
@@ -27,15 +28,12 @@ def read_one(person_id):
     """
     This function responds to a request for /api/people/{person_id}
     with one matching person from people
+
     :param person_id:   Id of person to find
     :return:            person matching id
     """
-    # Build the initial query
-    person = (
-        Person.query.filter(Person.person_id == person_id)
-        .outerjoin(Note)
-        .one_or_none()
-    )
+    # Get the person requested
+    person = Person.query.filter(Person.person_id == person_id).one_or_none()
 
     # Did we find a person?
     if person is not None:
@@ -47,13 +45,17 @@ def read_one(person_id):
 
     # Otherwise, nope, didn't find that person
     else:
-        abort(404, f"Person not found for Id: {person_id}")
+        abort(
+            404,
+            "Person not found for Id: {person_id}".format(person_id=person_id),
+        )
 
 
 def create(person):
     """
     This function creates a new person in the people structure
     based on the passed in person data
+
     :param person:  person to create in people structure
     :return:        201 on success, 406 on person exists
     """
@@ -84,12 +86,20 @@ def create(person):
 
     # Otherwise, nope, person exists already
     else:
-        abort(409, f"Person {fname} {lname} exists already")
+        abort(
+            409,
+            "Person {fname} {lname} exists already".format(
+                fname=fname, lname=lname
+            ),
+        )
 
 
 def update(person_id, person):
     """
     This function updates an existing person in the people structure
+    Throws an error if a person with the name we want to update to
+    already exists in the database.
+
     :param person_id:   Id of the person to update in the people structure
     :param person:      person to update
     :return:            updated person structure
@@ -99,8 +109,36 @@ def update(person_id, person):
         Person.person_id == person_id
     ).one_or_none()
 
-    # Did we find an existing person?
-    if update_person is not None:
+    # Try to find an existing person with the same name as the update
+    fname = person.get("fname")
+    lname = person.get("lname")
+
+    existing_person = (
+        Person.query.filter(Person.fname == fname)
+        .filter(Person.lname == lname)
+        .one_or_none()
+    )
+
+    # Are we trying to find a person that does not exist?
+    if update_person is None:
+        abort(
+            404,
+            "Person not found for Id: {person_id}".format(person_id=person_id),
+        )
+
+    # Would our update create a duplicate of another person already existing?
+    elif (
+        existing_person is not None and existing_person.person_id != person_id
+    ):
+        abort(
+            409,
+            "Person {fname} {lname} exists already".format(
+                fname=fname, lname=lname
+            ),
+        )
+
+    # Otherwise go ahead and update!
+    else:
 
         # turn the passed in person into a db object
         schema = PersonSchema()
@@ -118,14 +156,11 @@ def update(person_id, person):
 
         return data, 200
 
-    # Otherwise, nope, didn't find that person
-    else:
-        abort(404, f"Person not found for Id: {person_id}")
-
 
 def delete(person_id):
     """
     This function deletes a person from the people structure
+
     :param person_id:   Id of the person to delete
     :return:            200 on successful delete, 404 if not found
     """
@@ -136,8 +171,13 @@ def delete(person_id):
     if person is not None:
         db.session.delete(person)
         db.session.commit()
-        return make_response(f"Person {person_id} deleted", 200)
+        return make_response(
+            "Person {person_id} deleted".format(person_id=person_id), 200
+        )
 
     # Otherwise, nope, didn't find that person
     else:
-        abort(404, f"Person not found for Id: {person_id}")
+        abort(
+            404,
+            "Person not found for Id: {person_id}".format(person_id=person_id),
+        )
