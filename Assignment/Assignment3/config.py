@@ -13,8 +13,8 @@ app = connex_app.app
 
 # Configure the SQLAlchemy part of the app instance
 app.config['SQLALCHEMY_ECHO'] = True
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'people.db')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://owxetcxykqigsm:50a02a4ae1cd4baf043798fc9b64182cae0be2ebf1d5ed240a7c79d9d7105185@ec2-3-209-124-113.compute-1.amazonaws.com:5432/deph9n6van4bop' + os.path.join(basedir, 'people.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'people.db')
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://owxetcxykqigsm:50a02a4ae1cd4baf043798fc9b64182cae0be2ebf1d5ed240a7c79d9d7105185@ec2-3-209-124-113.compute-1.amazonaws.com:5432/deph9n6van4bop' + os.path.join(basedir, 'people.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # uri = os.getenv("DATABASE_URL")
